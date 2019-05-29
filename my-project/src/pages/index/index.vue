@@ -1,56 +1,48 @@
 <template>
-  <div @click="clickHandle">
+<view class="container">
+  <view class='pay-channel'>
+    <view class='alipay-default btn' bindtap='bindAlipay' v-if="alipayRight == '0'">+</view>
+    <view  class='alipay-right btn' bindtap='bindAlipay' v-else-if="alipayRight == '1'"></view>
+    <view  class='alipay-wrong btn' bindtap='bindAlipay' v-else-if="alipayRight == '2'"></view>
 
-    <div class="userinfo" @click="bindViewTap">
-      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
-      <img class="userinfo-avatar" src="/static/images/user.png" background-size="cover" />
-
-      <div class="userinfo-nickname">
-        <card :text="userInfo.nickName"></card>
-      </div>
-    </div>
-
-    <div class="usermotto">
-      <div class="user-motto">
-        <card :text="motto"></card>
-      </div>
-    </div>
-
-    <form class="form-container">
-      <input type="text" class="form-control" :value="motto" placeholder="v-model" />
-      <input type="text" class="form-control" v-model="motto" placeholder="v-model" />
-      <input type="text" class="form-control" v-model.lazy="motto" placeholder="v-model.lazy" />
-    </form>
-
-    <a href="/pages/counter/main" class="counter">去往Vuex示例页面</a>
-
-    <div class="all">
-        <div class="left">
-        </div>
-        <div class="right">
-        </div>
-    </div>
-  </div>
+    <view class='wechat-default btn' bindtap='bindWechat' v-if="wechatRight == '0'">+</view>
+    <view class='wechat-right btn' bindtap='bindWechat' v-if="wechatRight == '1'"></view>
+    <view class='wechat-wrong btn' bindtap='bindWechat' v-if="wechatRight == '2'"></view>
+  </view>
+  <!-- 类型  -->
+  <view class='pay-container'>
+    <view class='pay-title'>支付宝</view>
+    <view class='pay-title'>微信</view>
+  </view>
+  <!-- logo -->
+  <view class='logo-default' bindtap='bindLogo' v-if="logoRight == '0'">logo</view>
+    <view class='logo-right' bindtap='bindLogo' v-if="logoRight == '1'">logo</view>
+  <!-- 合并 -->
+  <view>
+    <view class='submit-button btn' bindtap='bindSubmit'>立即合并</view>
+    <view class='footer'>
+      <view class='about' bindtap='bindGuide'>使用手册</view>
+      <view class='about' bindtap='bindAbout'>产品介绍</view> 
+    </view>
+    
+  </view>
+</view>
 </template>
 
 <script>
-import card from '@/components/card'
 
 export default {
   data () {
     return {
-      motto: 'Hello miniprograme',
-      userInfo: {
-        nickName: 'mpvue',
-        avatarUrl: 'http://mpvue.com/assets/logo.png'
-      }
+      alipay: '',
+      wechat: '',
+      logo: '',
+      // 0：默认， 1：正确， 2：错误
+      alipayRight: '0',
+      wechatRight: '0',
+      logoRight: '0'
     }
   },
-
-  components: {
-    card
-  },
-
   methods: {
     bindViewTap () {
       const url = '../logs/main'
@@ -73,54 +65,128 @@ export default {
 </script>
 
 <style scoped>
-.userinfo {
+.paytype-button {
+  background-color: #F9F9F9;
+}
+
+.pay-channel {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+}
+
+.btn {
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
+  border-color: red;
+  border-width: 1px;
+  margin-right: 25px;
+  margin-left: 25px;
+}
+
+.alipay-default {
+  background-color: #F9F9F9;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: green;
+  font-size: xx-large;
+}
+.alipay-right {
+  background-color: #118CE2;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.alipay-wrong {
+  background-color: #EE6363;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.wechat-default {
+  background-color: #F9F9F9;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: green;
+  font-size: xx-large;
+}
+.wechat-right {
+  background-color: #229F2B;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.wechat-wrong {
+  background-color: #EE6363;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.logo-default {
+  background-color: #F9F9F9;
+  width: 100px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+  border-radius: 18px;
+  color: green;
+}
+
+.logo-right {
+  background-color: #9ACD32;
+  width: 100px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+  border-radius: 18px;
+  color: white;
+}
+
+.submit-button {
+  margin-top: 30px;
+  width: 160px;
+   height: 80px; 
+  background-color: #F9F9F9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: green;
+}
+
+.pay-container {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.pay-title {
+  width: 70px;
+  display: flex;
+  justify-content: center;
   align-items: center;
 }
 
-.userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
+.footer {
+  position: fixed; 
+  bottom: 20rpx;   
+  right: 20rpx;
+  left: 20px;     
+  height: 40rpx;  
+  text-align: center; 
+  display: flex;
+  justify-content: center;
 }
-
-.userinfo-nickname {
-  color: #aaa;
-}
-
-.usermotto {
-  margin-top: 150px;
-}
-
-.form-control {
-  display: block;
-  padding: 0 12px;
-  margin-bottom: 5px;
-  border: 1px solid #ccc;
-}
-.all{
-  width:7.5rem;
-  height:1rem;
-  background-color:blue;
-}
-.all:after{
-  display:block;
-  content:'';
-  clear:both;
-}
-.left{
-  float:left;
-  width:3rem;
-  height:1rem;
-  background-color:red;
-}
-
-.right{
-  float:left;
-  width:4.5rem;
-  height:1rem;
-  background-color:green;
+.about {  
+  color: green;  
+  bottom: 20rpx;   
+  right: 20rpx;
+  left: 20px;     
+  height: 40rpx;  
+  text-align: center;
+  font-size: x-small;
+  padding: 5px;
 }
 </style>
