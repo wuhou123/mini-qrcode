@@ -21,7 +21,7 @@
         </view>
         <view class="padding-xs solids"
               @tap="ChooseImage"
-              v-if="imgList.length<4">
+              v-if="imgList.length<1">
           <text class='icon-cameraadd'></text>
         </view>
       </view>
@@ -37,20 +37,22 @@
               :class="index>num?'':'text-blue'"
               v-for="(item,index) in numList"
               :key="index">
+    <!-- :class="index==2?'err':''" -->
           <text class="num"
-                :class="index==2?'err':''"
+          :class="item.status?'':'err'"
                 :data-index="index + 1"></text> {{item.name}}
         </view>
       </view>
       <view class="action margin-top">
         <button class="cu-btn bg-green shadow"
-                @tap="NumSteps">下一步</button>
+                @tap="NumSteps">
+                <text class="icon-loading2 iconfont-spin" v-if="isRepeat"></text>
+                {{tips[num]}}</button>
+        <button class="cu-btn bg-green shadow margin-left" @tap="nextSteps" v-if="num===2">跳过</button>
       </view>
     </view>
     <!-- 合并 -->
     <view>
-      <!-- <view class='submit-button btn'
-            bindtap='bindSubmit'>立即合并</view> -->
       <view class='footer'>
         <view class='about'
               bindtap='bindGuide'>使用手册</view>
@@ -67,26 +69,34 @@
 export default {
   data () {
     return {
+      isRepeat: false,
       alipay: '',
       wechat: '',
+      yunfu: '',
       logo: '',
       // 0：默认， 1：正确， 2：错误
       alipayRight: '0',
       wechatRight: '0',
       logoRight: '0',
       numList: [{
-        name: '开始'
+        name: '开始',
+        status: true
       }, {
-        name: '支付宝码'
+        name: '支付宝码',
+        status: true
       }, {
-        name: '微信码'
+        name: '微信码',
+        status: true
       }, {
-        name: '云闪付码(可跳过)'
+        name: '云闪付码(可跳过)',
+        status: true
       }, {
-        name: '合并'
+        name: '合并',
+        status: false
       }],
       num: 0,
-      imgList: []
+      imgList: [],
+      tips: ['支付宝', '微信', '云闪付', '合并', '重新合并']
     }
   },
   methods: {
@@ -102,8 +112,85 @@ export default {
       console.log('clickHandle:', ev)
       // throw {message: 'custom test'}
     },
+    nextSteps () {
+      this.num++
+    },
     NumSteps () {
-      this.num = this.num === this.numList.length - 1 ? 0 : this.num + 1
+      console.log(this.tips[this.num])
+      let that = this
+      switch (this.num) {
+        case 0:
+          this.isRepeat = true
+          wx.scanCode({
+            success: function (e) {
+              that.isRepeat = false
+              console.log(e.result)
+              if (e.result.indexOf('https://qr.alipay.com/') >= 0) {
+                console.log(e.result.slice(22))
+                that.alipay = e.result
+                that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+              } else {
+                wx.showToast({
+                  title: '支付宝收款码错误',
+                  icon: 'none'
+                })
+              }
+            },
+            fail: function (e) {
+              that.isRepeat = false
+            }
+          })
+          break
+        case 1:
+          wx.scanCode({
+            success: function (e) {
+              that.isRepeat = false
+              console.log(e.result)
+              if (e.result.indexOf('wxp://') >= 0) {
+                that.wechat = e.result
+                that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+              } else {
+                wx.showToast({
+                  title: '微信收款码错误',
+                  icon: 'none'
+                })
+              }
+            },
+            fail: function (e) {
+              that.isRepeat = false
+            }
+          })
+          break
+        case 2:
+          wx.scanCode({
+            success: function (e) {
+              that.isRepeat = false
+              console.log(e.result)
+              if (e.result.indexOf('https://qr.95516.com') >= 0) {
+                that.yunfu = e.result
+                that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+              } else {
+                wx.showToast({
+                  title: '云闪付收款码错误',
+                  icon: 'none'
+                })
+              }
+            },
+            fail: function (e) {
+              that.isRepeat = false
+            }
+          })
+          break
+        case 3:
+          that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+          wx.navigateTo({
+            url: '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu
+          })
+          break
+        case 4:
+          that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+          break
+      }
     },
     ChooseImage () {
       wx.chooseImage({
@@ -127,8 +214,8 @@ export default {
     },
     DelImg (e) {
       wx.showModal({
-        title: '召唤师',
-        content: '确定要删除这段回忆吗？',
+        title: '提示',
+        content: '确定要删除该logo吗？',
         cancelText: '再看看',
         confirmText: '再见',
         success: res => {
