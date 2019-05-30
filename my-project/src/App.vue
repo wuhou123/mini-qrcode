@@ -12,7 +12,7 @@ export default {
 
     let logs
     if (mpvuePlatform === 'my') {
-      logs = mpvue.getStorageSync({key: 'logs'}).data || []
+      logs = mpvue.getStorageSync({ key: 'logs' }).data || []
       logs.unshift(Date.now())
       mpvue.setStorageSync({
         key: 'logs',
@@ -31,6 +31,8 @@ export default {
 </script>
 
 <style>
+@import "../static/css/icon.css";
+@import "../static/css/colorui.css";
 .container {
   height: 100%;
   display: flex;
