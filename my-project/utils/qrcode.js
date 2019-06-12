@@ -736,8 +736,8 @@ var QR = (function () {
       var roundedSize = px * (width + 8)
       var offset = Math.floor((size - roundedSize) / 2)
       size = roundedSize
-      ctx.clearRect(0, 0, cavW, cavW)
-      ctx.setFillStyle('#000000')
+      // ctx.clearRect(0, 0, cavW, cavW)
+      // ctx.setFillStyle('#000000')
       for (var i = 0; i < width; i++) {
         for (var j = 0; j < width; j++) {
           if (frame[j * width + i]) {

@@ -2,10 +2,15 @@
   <view>
     <view class="cu-bar bg-white solid-bottom">
       <view class="action">
-        <text class="icon-title text-orange"></text> 上传LOGO
+        <text class="icon-title text-orange"></text> 上传LOGO及标语
+      </view>
+      <view class="action">
+			<view class="cu-form-group">
+				<switch class='orange radius' @change="SwitchD" :class="switchD?'checked':''" :checked="switchD?true:false"></switch>
+			</view>
       </view>
     </view>
-    <view class="cu-form-group">
+    <view class="cu-form-group" v-show="switchD">
       <view class="grid col-4 grid-square flex-sub">
         <view class="padding-xs bg-img"
               :style="'background-image:url(' + imgList[index] +')'"
@@ -26,6 +31,11 @@
         </view>
       </view>
     </view>
+    <!-- 输入框 -->
+    <view class="cu-form-group" v-show="switchD">
+      <view class="title">标语</view>
+      <input placeholder="标语" name="input" @change="setMsg"/>
+    </view>
     <view class="cu-bar bg-white solid-bottom margin-top">
       <view class="action">
         <text class="icon-title text-orange"></text> 4步完成
@@ -37,7 +47,6 @@
               :class="index>num?'':'text-blue'"
               v-for="(item,index) in numList"
               :key="index">
-    <!-- :class="index==2?'err':''" -->
           <text class="num"
           :class="item.status?'':'err'"
                 :data-index="index + 1"></text> {{item.name}}
@@ -48,7 +57,8 @@
                 @tap="NumSteps">
                 <text class="icon-loading2 iconfont-spin" v-if="isRepeat"></text>
                 {{tips[num]}}</button>
-        <button class="cu-btn bg-green shadow margin-left" @tap="nextSteps" v-if="num===2">跳过</button>
+        <button class="cu-btn bg-green shadow margin-left" @tap="nextSteps(num)" v-if="num===2">跳过</button>
+        <button class="cu-btn bg-green shadow margin-left" @tap="nextSteps(num)" v-if="num===4">再次合并</button>
       </view>
     </view>
     <!-- 合并 -->
@@ -74,10 +84,6 @@ export default {
       wechat: '',
       yunfu: '',
       logo: '',
-      // 0：默认， 1：正确， 2：错误
-      alipayRight: '0',
-      wechatRight: '0',
-      logoRight: '0',
       numList: [{
         name: '开始',
         status: true
@@ -92,14 +98,23 @@ export default {
         status: true
       }, {
         name: '合并',
-        status: false
+        status: true
       }],
       num: 0,
       imgList: [],
-      tips: ['支付宝', '微信', '云闪付', '合并', '重新合并']
+      tips: ['支付宝', '微信', '云闪付', '合并', '重新开始'],
+      switchD: true,
+      msg: ''
     }
   },
   methods: {
+    setMsg (val) {
+      console.log(val.mp.detail.value)
+      this.msg = val.mp.detail.value
+    },
+    SwitchD () {
+      this.switchD = !this.switchD
+    },
     bindViewTap () {
       const url = '../logs/main'
       if (mpvuePlatform === 'wx') {
@@ -110,10 +125,24 @@ export default {
     },
     clickHandle (ev) {
       console.log('clickHandle:', ev)
-      // throw {message: 'custom test'}
     },
-    nextSteps () {
-      this.num++
+    nextSteps (num) {
+      let that = this
+      if (num === 2) {
+        wx.showModal({
+          title: '提示',
+          content: '确定要重头来过吗？',
+          cancelText: '取消',
+          confirmText: '确定',
+          success: res => {
+            this.num++
+          }
+        })
+      } else {
+        wx.navigateTo({
+          url: '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&msg=' + that.msg
+        })
+      }
     },
     NumSteps () {
       console.log(this.tips[this.num])
@@ -184,7 +213,7 @@ export default {
         case 3:
           that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
           wx.navigateTo({
-            url: '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu
+            url: '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&msg=' + that.msg
           })
           break
         case 4:
@@ -198,11 +227,9 @@ export default {
         sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
         sourceType: ['album'], // 从相册选择
         success: (res) => {
-          if (this.imgList.length !== 0) {
-            this.imgList = this.imgList.concat(res.tempFilePaths)
-          } else {
-            this.imgList = res.tempFilePaths
-          }
+          console.log(res)
+          this.imgList = res.tempFilePaths
+          this.logo = res.tempFilePaths[0]
         }
       })
     },
