@@ -698,9 +698,9 @@ var QR = (function () {
 		    return out
     },
 
-    draw: function (str, canvas, cavW, cavH, ecc) {
+    draw: function (str, canvas, cavW, cavH, ecc,sx,sy) {
       //
-      console.log(canvas)
+      console.log(str, canvas, cavW, cavH, ecc,sx,sy)
       var ctx = canvas
       // ctx = wx.createCanvasContext(canvas)
       console.log(ctx)
@@ -741,7 +741,7 @@ var QR = (function () {
       for (var i = 0; i < width; i++) {
         for (var j = 0; j < width; j++) {
           if (frame[j * width + i]) {
-            ctx.fillRect(px * (4 + i) + offset, px * (4 + j) + offset, px, px)
+            ctx.fillRect(px * (4 + i) + sx+offset, px * (4 + j) + sy+offset, px, px)
           }
         }
       }

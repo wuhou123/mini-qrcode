@@ -1,9 +1,9 @@
 <template>
     <view class="qrcode-box">
   <view class="qrcode-container">
-    <view class="qrcode-top">
+    <!-- <view class="qrcode-top">
       <text>收款码</text>
-    </view>
+    </view> -->
     <canvas @click="previewImg" canvas-id="mycanvas" class="qrcode"/>
     <!-- <canvas canvas-id='mylogo' v-if="logo" class='qrlogo'></canvas> -->
     <view class="qrcode-bottom">
@@ -41,31 +41,33 @@ export default {
     this.content = `https://www.wuhou123.cn/pay.html?ali=${this.alipay}&wx=${this.wechat}&yunfu=${this.yunfu}&msg=${this.msg}`
 
     // 绘图
-    let bg = '../../static/images/bg.jpg'
-    let weixin = '../../static/images/weixin.png'
-    let alipay = '../../static/images/alipay.png'
-    let yunfu = '../../static/images/yunfu.png'
-    let str = `『 ${this.msg ? this.msg : '扫码支付'} 』`
-    let size = this.setCanvasSize(300)
+    let bg = '../../static/images/zhaocai.png'
+    // let weixin = '../../static/images/weixin.png'
+    // let alipay = '../../static/images/alipay.png'
+    // let yunfu = '../../static/images/yunfu.png'
+    // let str = `『 ${this.msg ? this.msg : '扫码支付'} 』`
+    let size = this.setCanvasSize(100)
+    let sx = this.setCanvasSize(102)
+    let sy = this.setCanvasSize(213)
     const ctx = wx.createCanvasContext('mycanvas')
-    ctx.drawImage(bg, 0, 0, this.setCanvasSize(300).w, this.setCanvasSize(400).h)
-    QR.qrApi.draw(this.content, ctx, size.w, size.w)
+    ctx.drawImage(bg, 0, 0, this.setCanvasSize(300).w, this.setCanvasSize(500).h)
+    QR.qrApi.draw(this.content, ctx, size.w, size.w, 0, sx.w, sy.h)
     ctx.save()
-    if (this.logo) {
-      ctx.clearRect(this.setCanvasSize(129).w, this.setCanvasSize(129).h, 42, 42)
-      ctx.drawImage(this.logo, this.setCanvasSize(130).w, this.setCanvasSize(130).h, 40, 40)
-    }
-    ctx.drawImage(weixin, this.setCanvasSize(60).w, this.setCanvasSize(320).h, 40, 40)
-    ctx.drawImage(yunfu, this.setCanvasSize(120).w, this.setCanvasSize(315).h, 60, 45)
-    ctx.drawImage(alipay, this.setCanvasSize(200).w, this.setCanvasSize(320).h, 40, 40)
-    ctx.setFontSize(18)
-    ctx.setFillStyle('#ffffff')
-    ctx.fillText(str, (this.setCanvasSize(300).w - ctx.measureText(str).width) / 2, this.setCanvasSize(300).h)
-    ctx.save()
-    let strTwo = '由“万能收钱码”小程序提供'
-    ctx.setFontSize(12)
-    ctx.setFillStyle('#F0E68C')
-    ctx.fillText(strTwo, (this.setCanvasSize(300).w - ctx.measureText(strTwo).width) / 2, this.setCanvasSize(388).h)
+    // if (this.logo) {
+    //   ctx.clearRect(this.setCanvasSize(129).w, this.setCanvasSize(129).h, 42, 42)
+    //   ctx.drawImage(this.logo, this.setCanvasSize(130).w, this.setCanvasSize(130).h, 40, 40)
+    // }
+    // ctx.drawImage(weixin, this.setCanvasSize(60).w, this.setCanvasSize(320).h, 40, 40)
+    // ctx.drawImage(yunfu, this.setCanvasSize(120).w, this.setCanvasSize(315).h, 60, 45)
+    // ctx.drawImage(alipay, this.setCanvasSize(200).w, this.setCanvasSize(320).h, 40, 40)
+    // ctx.setFontSize(18)
+    // ctx.setFillStyle('#ffffff')
+    // ctx.fillText(str, (this.setCanvasSize(300).w - ctx.measureText(str).width) / 2, this.setCanvasSize(300).h)
+    // ctx.save()
+    // let strTwo = '由“万能收钱码”小程序提供'
+    // ctx.setFontSize(12)
+    // ctx.setFillStyle('#F0E68C')
+    // ctx.fillText(strTwo, (this.setCanvasSize(300).w - ctx.measureText(strTwo).width) / 2, this.setCanvasSize(388).h)
     ctx.draw()
   },
   methods: {
@@ -152,7 +154,7 @@ page{
 
 .qrcode {
   width: 300px;
-  height: 400px;
+  height: 450px;
   background-color: white;
   position: relative;
 }
