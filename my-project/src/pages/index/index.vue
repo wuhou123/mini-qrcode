@@ -1,41 +1,5 @@
 <template>
   <view>
-    <view class="cu-bar bg-white solid-bottom">
-      <view class="action">
-        <text class="icon-title text-orange"></text> 上传LOGO及标语
-      </view>
-      <view class="action">
-			<view class="cu-form-group">
-				<switch class='orange radius' @change="SwitchD" :class="switchD?'checked':''" :checked="switchD?true:false"></switch>
-			</view>
-      </view>
-    </view>
-    <view class="cu-form-group" v-show="switchD">
-      <view class="grid col-4 grid-square flex-sub">
-        <view class="padding-xs bg-img"
-              :style="'background-image:url(' + imgList[index] +')'"
-              v-for="(item,index) in imgList"
-              :key="index"
-              @tap="ViewImage"
-              :data-url="imgList[index]">
-          <view class="cu-tag bg-red"
-                @tap.stop="DelImg"
-                :data-index="index">
-            <text class='icon-close'></text>
-          </view>
-        </view>
-        <view class="padding-xs solids"
-              @tap="ChooseImage"
-              v-if="imgList.length<1">
-          <text class='icon-cameraadd'></text>
-        </view>
-      </view>
-    </view>
-    <!-- 输入框 -->
-    <view class="cu-form-group" v-show="switchD">
-      <view class="title">标语</view>
-      <input placeholder="标语" name="input" @change="setMsg"/>
-    </view>
     <view class="cu-bar bg-white solid-bottom margin-top">
       <view class="action">
         <text class="icon-title text-orange"></text> 4步完成
@@ -44,7 +8,7 @@
     <view class="bg-white padding text-center">
       <view class="cu-steps">
         <view class="cu-item"
-              :class="index>num?'':'text-blue'"
+              :class="index>num?'':'text-orange'"
               v-for="(item,index) in numList"
               :key="index">
           <text class="num"
@@ -65,9 +29,7 @@
     <view>
       <view class='footer'>
         <view class='about'
-              bindtap='bindGuide'>使用手册</view>
-        <view class='about'
-              bindtap='bindAbout'>产品介绍</view>
+              @tap='goDetail()'>使用手册</view>
       </view>
 
     </view>
@@ -102,15 +64,37 @@ export default {
       }],
       num: 0,
       imgList: [],
-      tips: ['支付宝', '微信', '云闪付', '合并', '重新开始'],
+      tips: ['上传支付宝码', '上传微信码', '上传云闪付码', '点击合并', '重新开始'],
       switchD: true,
-      msg: ''
+      concatUrl: '',
+      code: '',
+      openId: ''
     }
   },
   methods: {
-    setMsg (val) {
-      console.log(val.mp.detail.value)
-      this.msg = val.mp.detail.value
+    login () {
+      let that = this
+      wx.login({
+        success: function (res) {
+          that.code = res.code
+          that.getOpenId()
+        }
+      })
+    },
+    getOpenId () {
+      let that = this
+      wx.cloud.callFunction({
+        name: 'index',
+        data: {type: 'getOpenId', js_code: that.code, grant_type: 'authorization_code'}
+      }).then(res => {
+        this.openId = res.result.home.openid
+        console.log('id', this.openId)
+      }).catch(error => { console.log(error) })
+    },
+    goDetail () {
+      wx.navigateTo({
+        url: '../guide/main'
+      })
     },
     SwitchD () {
       this.switchD = !this.switchD
@@ -139,8 +123,9 @@ export default {
           }
         })
       } else {
+        that.concatUrl = '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&openId=' + that.openId
         wx.navigateTo({
-          url: '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&msg=' + that.msg
+          url: that.concatUrl
         })
       }
     },
@@ -149,6 +134,7 @@ export default {
       let that = this
       switch (this.num) {
         case 0:
+          this.addUrl()
           this.isRepeat = true
           wx.scanCode({
             success: function (e) {
@@ -212,8 +198,9 @@ export default {
           break
         case 3:
           that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+          that.concatUrl = '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&openId=' + that.openId
           wx.navigateTo({
-            url: '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&msg=' + that.msg
+            url: that.concatUrl
           })
           break
         case 4:
@@ -256,6 +243,7 @@ export default {
 
   created () {
     // let app = getApp()
+    this.login()
   }
 }
 </script>
@@ -366,11 +354,8 @@ export default {
 }
 
 .footer {
-  position: fixed;
-  bottom: 20rpx;
-  right: 20rpx;
-  left: 20px;
-  height: 40rpx;
+  height: 80rpx;
+  line-height:80rpx;
   text-align: center;
   display: flex;
   justify-content: center;

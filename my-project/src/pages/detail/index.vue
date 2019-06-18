@@ -1,11 +1,7 @@
 <template>
     <view class="qrcode-box">
   <view class="qrcode-container">
-    <!-- <view class="qrcode-top">
-      <text>收款码</text>
-    </view> -->
     <canvas @click="previewImg" canvas-id="mycanvas" class="qrcode"/>
-    <!-- <canvas canvas-id='mylogo' v-if="logo" class='qrlogo'></canvas> -->
     <view class="qrcode-bottom">
       <view>支持微信、支付宝、云闪付</view>
       <view>点击保存相册</view>
@@ -23,7 +19,9 @@ export default {
       logo: '',
       alipay: '',
       wechat: '',
-      yunfu: ''
+      yunfu: '',
+      openId: '',
+      options: {}
     }
   },
   onLoad: function (options) {
@@ -32,20 +30,19 @@ export default {
     })
     // FKX05639AEMUOSN0TE016F
     // f2f0JV5T664Amfb_JDHLXtMBTrL2_8PvU68O
-    console.log(options)
+    this.options = JSON.stringify(options)
     this.alipay = options['alipay'] || ''
     this.wechat = options['wechat'] || ''
     this.logo = options['logo'] || ''
     this.yunfu = options['yunfu'] || ''
-    this.msg = options['msg'] || ''
-    this.content = `https://www.wuhou123.cn/pay.html?ali=${this.alipay}&wx=${this.wechat}&yunfu=${this.yunfu}&msg=${this.msg}`
+    this.openId = options['openId'] || ''
+    this.content = `https://www.wuhou123.cn/pay.html?ali=${this.alipay}&wx=${this.wechat}&yunfu=${this.yunfu}`
 
     // 绘图
     let bg = '../../static/images/zhaocai.png'
     // let weixin = '../../static/images/weixin.png'
     // let alipay = '../../static/images/alipay.png'
     // let yunfu = '../../static/images/yunfu.png'
-    // let str = `『 ${this.msg ? this.msg : '扫码支付'} 』`
     let size = this.setCanvasSize(100)
     let sx = this.setCanvasSize(102)
     let sy = this.setCanvasSize(213)
@@ -87,6 +84,7 @@ export default {
       return size
     },
     previewImg () {
+      let that = this
       wx.showActionSheet({
         itemList: ['保存收款码'],
         success: function (res) {
@@ -100,7 +98,7 @@ export default {
                 wx.saveImageToPhotosAlbum({
                   filePath: res.tempFilePath,
                   success: function success (res) {
-                    console.log('saved::' + res.savedFilePath)
+                    that.addUrl()
                     wx.showToast({
                       title: '保存成功'
                     })
@@ -120,6 +118,14 @@ export default {
           console.log(res.errMsg)
         }
       })
+    },
+    addUrl () {
+      let that = this
+      wx.cloud.callFunction({
+        name: 'index',
+        data: {type: 'addUrl', list: {url: that.options, openid: that.openId}}
+      }).then(res => {
+      }).catch(error => { console.log(error) })
     }
   }
 
