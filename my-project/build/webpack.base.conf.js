@@ -15,13 +15,13 @@ function resolve (dir) {
 }
 
 function getEntry (rootSrc) {
-  var map = {};
+  var map = {}
   glob.sync(rootSrc + '/pages/**/main.js')
-  .forEach(file => {
-    var key = relative(rootSrc, file).replace('.js', '');
-    map[key] = file;
-  })
-   return map;
+    .forEach(file => {
+      var key = relative(rootSrc, file).replace('.js', '')
+      map[key] = file
+    })
+  return map
 }
 
 const appEntry = { app: resolve('./src/main.js') }
@@ -69,6 +69,10 @@ let baseWebpackConfig = {
         options: vueLoaderConfig
       },
       {
+        test: /.less$/,
+        loader: 'style-loader!css-loader!less-loader'
+      },
+      {
         test: /\.js$/,
         include: [resolve('src'), resolve('test')],
         use: [
@@ -76,7 +80,7 @@ let baseWebpackConfig = {
           {
             loader: 'mpvue-loader',
             options: Object.assign({checkMPEntry: true}, vueLoaderConfig)
-          },
+          }
         ]
       },
       {

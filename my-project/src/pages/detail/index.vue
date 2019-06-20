@@ -30,7 +30,7 @@ export default {
     })
     // FKX05639AEMUOSN0TE016F
     // f2f0JV5T664Amfb_JDHLXtMBTrL2_8PvU68O
-    this.options = JSON.stringify(options)
+    this.options = options
     this.alipay = options['alipay'] || ''
     this.wechat = options['wechat'] || ''
     this.logo = options['logo'] || ''
@@ -44,8 +44,8 @@ export default {
     // let alipay = '../../static/images/alipay.png'
     // let yunfu = '../../static/images/yunfu.png'
     let size = this.setCanvasSize(100)
-    let sx = this.setCanvasSize(102)
-    let sy = this.setCanvasSize(213)
+    let sx = this.setCanvasSize(101)
+    let sy = this.setCanvasSize(212)
     const ctx = wx.createCanvasContext('mycanvas')
     ctx.drawImage(bg, 0, 0, this.setCanvasSize(300).w, this.setCanvasSize(500).h)
     QR.qrApi.draw(this.content, ctx, size.w, size.w, 0, sx.w, sy.h)

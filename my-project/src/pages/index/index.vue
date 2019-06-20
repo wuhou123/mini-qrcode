@@ -134,7 +134,6 @@ export default {
       let that = this
       switch (this.num) {
         case 0:
-          this.addUrl()
           this.isRepeat = true
           wx.scanCode({
             success: function (e) {

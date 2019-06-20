@@ -1,5 +1,5 @@
 {
-  "pages": ["pages/index/main", "pages/logs/main", "pages/counter/main","pages/detail/main","pages/guide/main"],
+  "pages": ["pages/index/main", "pages/logs/main", "pages/counter/main","pages/detail/main","pages/guide/main","pages/my/main"],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
@@ -22,7 +22,7 @@
       },
       {
         "text": "订单",
-        "pagePath": "pages/logs/main",
+        "pagePath": "pages/my/main",
         "iconPath": "static/tabs/orders.png",
         "selectedIconPath": "static/tabs/orders-active.png"
       }
@@ -37,7 +37,7 @@
       },
       {
         "name": "订单",
-        "pagePath": "pages/logs/main",
+        "pagePath": "pages/my/main",
         "icon": "static/tabs/orders.png",
         "activeIcon": "static/tabs/orders-active.png"
       }
