@@ -12,7 +12,7 @@
     </div>
     <div class="cu-list menu margin1">
       <div class="cu-item arrow"
-           @click="modalName='Image'">
+           @click="goMaList">
         <div class="content">
           <text class="icon-circlefill text-grey"></text>
           <text class="text-grey">我的收钱码</text>
@@ -35,6 +35,13 @@ export default {
   data () {
     return {
 
+    }
+  },
+  methods: {
+    goMaList () {
+      wx.navigateTo({
+        url: '/pages/qrcode/main'
+      })
     }
   }
 }
