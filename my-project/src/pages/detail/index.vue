@@ -2,7 +2,7 @@
     <view class="qrcode-box">
   <view class="qrcode-container">
     <canvas @click="previewImg" canvas-id="mycanvas" class="qrcode"/>
-    <view class="qrcode-bottom">
+    <view class="qrcode-bottom" @click="previewImg">
       <view>支持微信、支付宝、云闪付</view>
       <view>点击保存相册</view>
     </view>
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { formatTime } from '@/utils'
 var QR = require('../../../utils/qrcode.js')
 export default {
   data () {
@@ -90,7 +91,6 @@ export default {
         success: function (res) {
           console.log(res.tapIndex)
           if (res.tapIndex === 0) {
-            console.log('保存收款码')
             wx.canvasToTempFilePath({
               canvasId: 'mycanvas',
               success: function (res) {
@@ -98,6 +98,7 @@ export default {
                 wx.saveImageToPhotosAlbum({
                   filePath: res.tempFilePath,
                   success: function success (res) {
+                    console.log('保存收款码')
                     that.addUrl()
                     wx.showToast({
                       title: '保存成功'
@@ -123,7 +124,7 @@ export default {
       let that = this
       wx.cloud.callFunction({
         name: 'index',
-        data: {type: 'addUrl', list: {url: that.options, openid: that.openId}}
+        data: {type: 'addUrl', list: {url: that.options, openid: that.openId, date: formatTime(new Date())}}
       }).then(res => {
       }).catch(error => { console.log(error) })
     }

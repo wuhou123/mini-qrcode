@@ -1,6 +1,5 @@
 // 爬虫
 const request = require('request-promise')
-const iconv = require('iconv-lite')
 
 const URL = {
   tengxunAPI: 'https://api.weixin.qq.com/sns/jscode2session'

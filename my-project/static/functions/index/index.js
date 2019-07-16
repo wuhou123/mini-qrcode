@@ -22,6 +22,21 @@ exports.main = async (event, context) => {
       break
     case 'getOpenId':
       res = await methods.getOpenId(event)
+      break
+    case 'del':
+      let obj = cloud.database()
+      res = await new Promise((resolve, reject) => {
+        obj.collection('list').doc(event.id).remove({
+          success: res => {
+            resolve(res)
+          },
+          fail: err => {
+            reject(err)
+          }
+        })
+      })
+
+      break
   }
   return {
     home: res

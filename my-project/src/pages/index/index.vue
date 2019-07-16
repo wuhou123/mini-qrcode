@@ -21,7 +21,7 @@
                 @tap="NumSteps">
                 <text class="icon-loading2 iconfont-spin" v-if="isRepeat"></text>
                 {{tips[num]}}</button>
-        <button class="cu-btn bg-green shadow margin-left" @tap="nextSteps(num)" v-if="num===2">跳过</button>
+        <button class="cu-btn bg-grey shadow margin-left" @tap="nextSteps(num)" v-if="num===2">跳过</button>
         <button class="cu-btn bg-green shadow margin-left" @tap="nextSteps(num)" v-if="num===4">再次合并</button>
       </view>
     </view>
@@ -64,7 +64,7 @@ export default {
       }],
       num: 0,
       imgList: [],
-      tips: ['上传支付宝码', '上传微信码', '上传云闪付码', '点击合并', '重新开始'],
+      tips: ['上传支付宝码', '上传微信码', '上传云闪付码', '立即合并', '重置'],
       switchD: true,
       concatUrl: '',
       code: '',
@@ -88,6 +88,10 @@ export default {
         data: {type: 'getOpenId', js_code: that.code, grant_type: 'authorization_code'}
       }).then(res => {
         this.openId = res.result.home.openid
+        wx.setStorage({
+          key: 'openid',
+          data: this.openId
+        })
         console.log('id', this.openId)
       }).catch(error => { console.log(error) })
     },
@@ -113,15 +117,16 @@ export default {
     nextSteps (num) {
       let that = this
       if (num === 2) {
-        wx.showModal({
-          title: '提示',
-          content: '确定要重头来过吗？',
-          cancelText: '取消',
-          confirmText: '确定',
-          success: res => {
-            this.num++
-          }
-        })
+        this.num++
+        // wx.showModal({
+        //   title: '提示',
+        //   content: '确定要跳吗？',
+        //   cancelText: '取消',
+        //   confirmText: '确定',
+        //   success: res => {
+        //     this.num++
+        //   }
+        // })
       } else {
         that.concatUrl = '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&openId=' + that.openId
         wx.navigateTo({
@@ -179,7 +184,6 @@ export default {
           wx.scanCode({
             success: function (e) {
               that.isRepeat = false
-              console.log(e.result)
               if (e.result.indexOf('https://qr.95516.com') >= 0) {
                 that.yunfu = e.result
                 that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
@@ -366,7 +370,7 @@ export default {
   left: 20px;
   height: 40rpx;
   text-align: center;
-  font-size: x-small;
+  font-size: 32rpx;
   padding: 5px;
 }
 </style>
