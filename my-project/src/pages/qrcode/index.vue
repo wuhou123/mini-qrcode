@@ -8,9 +8,13 @@
 <view class="cu-list menu">
 <view class="cu-item" v-for="(item,index) in list" :key="index">
 <view class="content padding-tb-sm">
-    <view @click="goEditor">
-        <text class="icon-edit text-grey"></text>
-        <text class="cuIcon-clothesfill text-blue margin-right-xs"></text>合成码
+    <view class="cu-form-group" v-if="item.status">
+      <input placeholder="输入备注名" name="input" v-model="inputVal" :auto-focus="true" maxlength="11"/>
+      <button class='cu-btn bg-green shadow' @click="goEditor(item,index)">确定</button>
+    </view>
+    <view @click="openEditor(item)" v-else>
+        <text class="icon-edit text-blue"></text>
+        <text class="cuIcon-clothesfill text-blue margin-right-xs"></text>{{item.url.name||'合成码'}}
     </view>
     <view class="text-gray text-sm">
         <text class="cuIcon-infofill margin-right-xs"></text>{{item.date}}</view>
@@ -18,11 +22,11 @@
 <view class="action">
     <button class="cu-btn round bg-red shadow margin-right" @click="del(item._id)">
 							<text class="cuIcon-upload"></text>删除</button>
-    <button class="cu-btn round bg-green shadow" @click="scan(item)">
+    <button class="cu-btn round bg-orange shadow" @click="scan(item)">
 							<text class="cuIcon-upload"></text>查看</button>                            
 </view>
 </view>
-<view class="cu-item align-center" v-if="!list||list.length==0">暂无历史二维码</view>
+<view class="cu-item align-center" v-if="list&&list.length==0">暂无历史二维码</view>
 </view>
 </view>
 
@@ -33,8 +37,9 @@ export default {
   name: 'qrcode',
   data () {
     return {
-      list: [],
-      openid: ''
+      list: null,
+      openid: '',
+      inputVal: ''
     }
   },
   mounted () {
@@ -51,10 +56,17 @@ export default {
       })
         .get({
           success: function (res) {
-            that.list = res.data || []
-            that.list.reverse()
+            let data = res.data || []
+            data.forEach(v => {
+              v.status = false
+              v.url.name = v.url.name || ''
+            })
+            that.list = data
           },
-          fail: console.error
+          fail: function (error) {
+            console.log(error)
+            that.list = []
+          }
         })
     },
     del (_id) {
@@ -85,11 +97,21 @@ export default {
         url: concatUrl
       })
     },
-    goEditor () {
-      wx.showToast({
-        icon: 'none',
-        title: '备注功能还在完善中'
-      })
+    openEditor (item) {
+      this.inputVal = item.url.name || ''
+      item.status = true
+    },
+    goEditor (item, index) {
+      item.status = !item.status
+      if (!this.inputVal) return
+      let params = Object.assign({}, item, {name: this.inputVal, id: this.list[index]._id})
+      wx.cloud.callFunction({
+        name: 'index',
+        data: {type: 'renewName', list: params}
+      }).then(res => {
+        item.url.name = this.inputVal
+        this.inputVal = ''
+      }).catch(error => { console.log(error) })
     }
   }
 

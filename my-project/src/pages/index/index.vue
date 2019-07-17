@@ -30,9 +30,29 @@
       <view class='footer'>
         <view class='about'
               @tap='goDetail()'>使用手册</view>
+        <view class='about'
+              @tap='goExplain()'>项目说明</view>
       </view>
-
     </view>
+    <!-- 窗口 -->
+		<view class="cu-modal" :class="modalStatus?'show':''">
+			<view class="cu-dialog">
+				<view class="cu-bar bg-white justify-end">
+					<view class="content">项目说明</view>
+					<view class="action" @click="modalStatus=false">
+						<text class="cuIcon-close text-red"></text>
+					</view>
+				</view>
+				<view class="padding-xl align-left">
+          <view>1.本项目只提供类型收钱码合并服务，扫码支付不会经过第三方，不会存储用户信息；</view>
+					<view>2.合并次数无限制，可以多次合并；</view>
+          <view>3.常见问题联系weixin:zx133455667</view>
+				</view>
+				<view class="cu-bar bg-white">
+					<view class="action margin-0 flex-sub text-green" @click="modalStatus=false">我知道了</view>
+				</view>
+			</view>
+		</view>
   </view>
 </template>
 
@@ -68,7 +88,8 @@ export default {
       switchD: true,
       concatUrl: '',
       code: '',
-      openId: ''
+      openId: '',
+      modalStatus: false
     }
   },
   methods: {
@@ -99,6 +120,9 @@ export default {
       wx.navigateTo({
         url: '../guide/main'
       })
+    },
+    goExplain () {
+      this.modalStatus = true
     },
     SwitchD () {
       this.switchD = !this.switchD
@@ -372,5 +396,8 @@ export default {
   text-align: center;
   font-size: 32rpx;
   padding: 5px;
+}
+.align-left{
+  text-align:left
 }
 </style>

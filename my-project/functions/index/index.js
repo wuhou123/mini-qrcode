@@ -26,16 +26,39 @@ exports.main = async (event, context) => {
     case 'del':
       let obj = cloud.database()
       res = await new Promise((resolve, reject) => {
-        obj.collection('list').doc(event.id).remove({
-          success: res => {
-            resolve(res)
-          },
-          fail: err => {
-            reject(err)
-          }
-        })
+        obj
+          .collection('list')
+          .doc(event.id)
+          .remove({
+            success: res => {
+              resolve(res)
+            },
+            fail: err => {
+              reject(err)
+            }
+          })
       })
-
+      break
+    case 'renewName':
+      let run = cloud.database()
+      res = await new Promise((resolve, reject) => {
+        run
+          .collection('list')
+          .doc(event.list.id)
+          .update({
+            data: {
+              url: {
+                name: event.list.name
+              }
+            }
+          })
+          .then(res => {
+            resolve(res)
+          })
+          .catch(error => {
+            reject(error)
+          })
+      })
       break
   }
   return {
