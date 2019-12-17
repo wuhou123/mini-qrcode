@@ -9,12 +9,12 @@
 <view class="cu-item" v-for="(item,index) in list" :key="index">
 <view class="content padding-tb-sm">
     <view class="cu-form-group" v-if="item.status">
-      <input placeholder="输入备注名" name="input" v-model="inputVal" :auto-focus="true" maxlength="11"/>
+      <input :placeholder="item.url.name||'点击编辑码名称'" name="input" v-model="inputVal" :auto-focus="true" maxlength="11"/>
       <button class='cu-btn bg-green shadow' @click="goEditor(item,index)">确定</button>
     </view>
     <view @click="openEditor(item)" v-else>
         <text class="icon-edit text-blue"></text>
-        <text class="cuIcon-clothesfill text-blue margin-right-xs"></text>{{item.url.name||'合成码'}}
+        <text class="cuIcon-clothesfill text-blue margin-right-xs"></text>{{item.url.name||'点击编辑码名称'}}
     </view>
     <view class="text-gray text-sm">
         <text class="cuIcon-infofill margin-right-xs"></text>{{item.date}}</view>
@@ -51,9 +51,11 @@ export default {
       let that = this
       console.log('res', this.openid)
       let db = wx.cloud.database()
-      db.collection('list').where({
-        openid: that.openid
-      })
+      db
+        .collection('list')
+        .where({
+          openid: that.openid
+        })
         .get({
           success: function (res) {
             let data = res.data || []
@@ -77,50 +79,71 @@ export default {
         confirmText: '确定',
         success: res => {
           if (res.confirm) {
-            wx.cloud.callFunction({
-              name: 'index',
-              data: {type: 'del', id: _id}
-            }).then(res => {
-              wx.showToast({
-                icon: 'none',
-                title: '删除成功'
+            wx.cloud
+              .callFunction({
+                name: 'index',
+                data: { type: 'del', id: _id }
               })
-              this.getList()
-            }).catch(error => { console.log(error) })
+              .then(res => {
+                wx.showToast({
+                  icon: 'none',
+                  title: '删除成功'
+                })
+                this.getList()
+              })
+              .catch(error => {
+                console.log(error)
+              })
           }
         }
       })
     },
     scan (item) {
-      let concatUrl = '../detail/main?alipay=' + item.url.alipay + '&wechat=' + item.url.wechat + '&logo=' + item.url.logo + '&yunfu=' + item.url.yunfu + '&openId=' + item.url.openId
+      let concatUrl =
+        '../detail/main?alipay=' +
+        item.url.alipay +
+        '&wechat=' +
+        item.url.wechat +
+        '&logo=' +
+        item.url.logo +
+        '&yunfu=' +
+        item.url.yunfu +
+        '&openId=' +
+        item.url.openId
       wx.navigateTo({
         url: concatUrl
       })
     },
     openEditor (item) {
-      this.inputVal = item.url.name || ''
       item.status = true
     },
     goEditor (item, index) {
       item.status = !item.status
       if (!this.inputVal) return
-      let params = Object.assign({}, item, {name: this.inputVal, id: this.list[index]._id})
-      wx.cloud.callFunction({
-        name: 'index',
-        data: {type: 'renewName', list: params}
-      }).then(res => {
-        item.url.name = this.inputVal
-        this.inputVal = ''
-      }).catch(error => { console.log(error) })
+      let params = Object.assign({}, item, {
+        name: this.inputVal,
+        id: this.list[index]._id
+      })
+      wx.cloud
+        .callFunction({
+          name: 'index',
+          data: { type: 'renewName', list: params }
+        })
+        .then(res => {
+          item.url.name = this.inputVal.slice()
+          this.inputVal = ''
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
   }
-
 }
 </script>
 
 <style lang="less" scoped>
-.cu-list.menu > .cu-item.align-center{
-  justify-content:center
+.cu-list.menu > .cu-item.align-center {
+  justify-content: center;
 }
 </style>
 

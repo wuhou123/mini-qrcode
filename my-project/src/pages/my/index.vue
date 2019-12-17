@@ -33,9 +33,7 @@
 export default {
   name: 'my',
   data () {
-    return {
-
-    }
+    return {}
   },
   methods: {
     goMaList () {
@@ -103,5 +101,4 @@ export default {
 .user-info-avatar image {
   border-radius: 50%;
 }
-
 </style>
