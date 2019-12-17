@@ -57,7 +57,6 @@
 </template>
 
 <script>
-
 export default {
   data () {
     return {
@@ -66,22 +65,28 @@ export default {
       wechat: '',
       yunfu: '',
       logo: '',
-      numList: [{
-        name: '开始',
-        status: true
-      }, {
-        name: '支付宝码',
-        status: true
-      }, {
-        name: '微信码',
-        status: true
-      }, {
-        name: '云闪付码(可跳过)',
-        status: true
-      }, {
-        name: '合并',
-        status: true
-      }],
+      numList: [
+        {
+          name: '开始',
+          status: true
+        },
+        {
+          name: '支付宝码',
+          status: true
+        },
+        {
+          name: '微信码',
+          status: true
+        },
+        {
+          name: '云闪付码(可跳过)',
+          status: true
+        },
+        {
+          name: '合并',
+          status: true
+        }
+      ],
       num: 0,
       imgList: [],
       tips: ['上传支付宝码', '上传微信码', '上传云闪付码', '立即合并', '重置'],
@@ -104,17 +109,26 @@ export default {
     },
     getOpenId () {
       let that = this
-      wx.cloud.callFunction({
-        name: 'index',
-        data: {type: 'getOpenId', js_code: that.code, grant_type: 'authorization_code'}
-      }).then(res => {
-        this.openId = res.result.home.openid
-        wx.setStorage({
-          key: 'openid',
-          data: this.openId
+      wx.cloud
+        .callFunction({
+          name: 'index',
+          data: {
+            type: 'getOpenId',
+            js_code: that.code,
+            grant_type: 'authorization_code'
+          }
         })
-        console.log('id', this.openId)
-      }).catch(error => { console.log(error) })
+        .then(res => {
+          this.openId = res.result.home.openid
+          wx.setStorage({
+            key: 'openid',
+            data: this.openId
+          })
+          console.log('id', this.openId)
+        })
+        .catch(error => {
+          console.log(error)
+        })
     },
     goDetail () {
       wx.navigateTo({
@@ -152,7 +166,17 @@ export default {
         //   }
         // })
       } else {
-        that.concatUrl = '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&openId=' + that.openId
+        that.concatUrl =
+          '../detail/main?alipay=' +
+          that.alipay +
+          '&wechat=' +
+          that.wechat +
+          '&logo=' +
+          that.logo +
+          '&yunfu=' +
+          that.yunfu +
+          '&openId=' +
+          that.openId
         wx.navigateTo({
           url: that.concatUrl
         })
@@ -168,10 +192,14 @@ export default {
             success: function (e) {
               that.isRepeat = false
               console.log(e.result)
-              if (e.result.indexOf('https://qr.alipay.com/') >= 0) {
+              if (
+                e.result.indexOf('https://qr.alipay.com/') >= 0 ||
+                e.result.indexOf('HTTPS://QR.ALIPAY.COM/') >= 0
+              ) {
                 console.log(e.result.slice(22))
                 that.alipay = e.result
-                that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+                that.num =
+                  that.num === that.numList.length - 1 ? 0 : that.num + 1
               } else {
                 wx.showToast({
                   title: '支付宝收款码错误',
@@ -191,7 +219,8 @@ export default {
               console.log(e.result)
               if (e.result.indexOf('wxp://') >= 0) {
                 that.wechat = e.result
-                that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+                that.num =
+                  that.num === that.numList.length - 1 ? 0 : that.num + 1
               } else {
                 wx.showToast({
                   title: '微信收款码错误',
@@ -210,7 +239,8 @@ export default {
               that.isRepeat = false
               if (e.result.indexOf('https://qr.95516.com') >= 0) {
                 that.yunfu = e.result
-                that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
+                that.num =
+                  that.num === that.numList.length - 1 ? 0 : that.num + 1
               } else {
                 wx.showToast({
                   title: '云闪付收款码错误',
@@ -225,7 +255,17 @@ export default {
           break
         case 3:
           that.num = that.num === that.numList.length - 1 ? 0 : that.num + 1
-          that.concatUrl = '../detail/main?alipay=' + that.alipay + '&wechat=' + that.wechat + '&logo=' + that.logo + '&yunfu=' + that.yunfu + '&openId=' + that.openId
+          that.concatUrl =
+            '../detail/main?alipay=' +
+            that.alipay +
+            '&wechat=' +
+            that.wechat +
+            '&logo=' +
+            that.logo +
+            '&yunfu=' +
+            that.yunfu +
+            '&openId=' +
+            that.openId
           wx.navigateTo({
             url: that.concatUrl
           })
@@ -240,7 +280,7 @@ export default {
         count: 1, // 默认9
         sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
         sourceType: ['album'], // 从相册选择
-        success: (res) => {
+        success: res => {
           console.log(res)
           this.imgList = res.tempFilePaths
           this.logo = res.tempFilePaths[0]
@@ -382,7 +422,7 @@ export default {
 
 .footer {
   height: 80rpx;
-  line-height:80rpx;
+  line-height: 80rpx;
   text-align: center;
   display: flex;
   justify-content: center;
@@ -397,7 +437,7 @@ export default {
   font-size: 32rpx;
   padding: 5px;
 }
-.align-left{
-  text-align:left
+.align-left {
+  text-align: left;
 }
 </style>
